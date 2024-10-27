@@ -1,0 +1,7 @@
+# Useless Files
+.DS_Store
+
+# Temp Directories
+.idea/
+__PYCACHE__/
+.jupyter/
