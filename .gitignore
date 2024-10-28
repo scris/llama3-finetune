@@ -5,3 +5,6 @@
 .idea/
 __PYCACHE__/
 .jupyter/
+
+# Model Files
+models/Llama-3.1-8B/*
