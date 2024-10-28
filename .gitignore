@@ -8,3 +8,4 @@ __PYCACHE__/
 
 # Model Files
 models/Llama-3.1-8B/*
+!models/Llama-3.1-8B/.gitkeep
