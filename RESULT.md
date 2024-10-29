@@ -1,6 +1,6 @@
 ### Task 1
 
-在单卡 4090 上使用 torchtune 对 Llama-3.1-8B-Instruct 进行了 lora 微调，数据集为 Alpaca Cleaned Dataset，单 epoch 耗时 2 小时 40 分钟。
+在单卡 4090 上使用 torchtune 对 Llama-3.1-8B-Instruct 进行了 lora 微调，数据集为 Alpaca Cleaned Dataset（24.1 MB），单 epoch 耗时 2 小时 40 分钟。
 
 在单卡 A6000 上使用 torchtune eleuther_eval 进行基于 truthfulqa_mc2 的模型评估，单次耗时约 3 分钟，最大内存占用 41.92 GB。
 
@@ -8,4 +8,8 @@
 
 ### Task 2
 
-继续基于 torchtune 并将场景改换到代码生成。
+继续基于 torchtune 并将场景改换到代码生成，数据集为 Python Code Instructions 18k Alpaca（11.4 MB）。
+
+在单卡 A6000 上，单 epoch 耗时 1 小时 30 分钟左右。
+
+- [ ] 更新 LoRA 层和 rank，查看结果区别
