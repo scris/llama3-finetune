@@ -8,8 +8,8 @@
 
 ### Task 2
 
-继续基于 torchtune 并将场景改换到代码生成，数据集为 Python Code Instructions 18k Alpaca（11.4 MB）。
+继续基于 torchtune 并将场景改换到代码生成，数据集为 Python Code Instructions 18k Alpaca（11.4 MB），在单卡 A6000 上单 epoch 耗时 1 小时 30 分钟。
 
-在单卡 A6000 上，单 epoch 耗时 1 小时 30 分钟左右。
+在单卡 A6000 上使用 torchtune eleuther_eval 进行基于 codexglue code2text_python 的模型评估。同时基于 truthfulqa_mc2 进行评估，结果是 0.5186 ± 0.015。
 
 - [ ] 更新 LoRA 层和 rank，查看结果区别

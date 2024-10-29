@@ -239,6 +239,8 @@ class LoRAFinetuneRecipeDistributed(FTRecipeInterface):
                 else None
             ),
         )
+        print(self._model)
+
         self._tokenizer = config.instantiate(cfg.tokenizer)
 
         self._optimizer = self._setup_optimizer(
@@ -511,6 +513,7 @@ class LoRAFinetuneRecipeDistributed(FTRecipeInterface):
     def _setup_optimizer(
             self, cfg_optimizer: DictConfig, opt_state_dict: Optional[Dict[str, Any]] = None
     ) -> Optimizer:
+        # 如果需要只用一层，可以在这里设置只传入模型某部分的 .parameters()
         optimizer = config.instantiate(cfg_optimizer, self._model.parameters())
         if opt_state_dict:
             training.load_from_full_optimizer_state_dict(

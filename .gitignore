@@ -11,6 +11,7 @@ models/Llama-3.1-8B/*
 !models/Llama-3.1-8B/.gitkeep
 models/Llama-3.1-8B-Instruct/*
 !models/Llama-3.1-8B-Instruct/.gitkeep
+!Architecture.md
 
 # Private Files
 IDEA.md
