@@ -41,7 +41,7 @@ class FullFinetuneRecipeSingleDevice(FTRecipeInterface):
             flag. Activation checkpointing helps reduce the memory footprint since we no longer keep
             activations in memory and instead recompute them during the backward pass. This is especially
             helpful for larger batch sizes when you're memory constrained. But these savings in memory
-            come at the cost of training performance. In most cases training can slow-down quite a bit as
+            come at the cost of training performance. In most cases training can slow down quite a bit as
             a result of this activation recomputation.
 
         - Precision. Full fp32 and bf16 training are supported. Precision is controlled using the ``dtype``
@@ -74,7 +74,7 @@ class FullFinetuneRecipeSingleDevice(FTRecipeInterface):
             since they help reduce the memory footprint associated with the optimizer states.
 
         - Checkpointing. Model weights are checkpointed both at the end of each epoch and at the end of
-            training. Optimizer State and recipe state (seed, total_epochs, number of epochs run etc) are
+            training. Optimizer State and recipe state (seed, total_epochs, number of epochs run etc.) are
             only saved at the end of a given epoch and used in case of resuming training.
 
             Resuming training is controlled by the ``resume_from_checkpoint`` flag. Mid-epoch checkpointing is
@@ -251,7 +251,7 @@ class FullFinetuneRecipeSingleDevice(FTRecipeInterface):
             collate_fn=collate_name,
         )
 
-        # Finally update the recipe state which can only be correctly set after all of the
+        # Finally update the recipe state which can only be correctly set after all the
         # other components have been initialized and updated.
         #
         # Number of training steps in each epoch depends on the number of batches produced
@@ -431,7 +431,7 @@ class FullFinetuneRecipeSingleDevice(FTRecipeInterface):
             collate_fn: str,
     ) -> Tuple[DistributedSampler, DataLoader]:
         """
-        All data related setup happens here. Currently this recipe only supports the
+        All data related setup happens here. Currently, this recipe only supports the
         DistributedSamplers with Map-style Datasets which fit into memory. Other samplers,
         iterable datasets and streaming datasets are not supported.
         """
@@ -503,6 +503,7 @@ class FullFinetuneRecipeSingleDevice(FTRecipeInterface):
             intermediate_checkpoint=(epoch + 1 < self.total_epochs),
         )
 
+    # 在 distributed 版本中为预定义的损失函数
     def _loss_step(self, batch: Dict[str, torch.Tensor]) -> torch.Tensor:
         # Shape [b, s], needed for the loss not the model
         labels = batch.pop("labels")

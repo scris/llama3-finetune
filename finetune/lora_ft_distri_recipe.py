@@ -57,7 +57,7 @@ class LoRAFinetuneRecipeDistributed(FTRecipeInterface):
             flag. Activation checkpointing helps reduce the memory footprint since we no longer keep
             activations in memory and instead recompute them during the backward pass. This is especially
             helpful for larger batch sizes when you're memory constrained. But these savings in memory
-            come at the cost of training performance. In most cases training can slow-down quite a bit as
+            come at the cost of training performance. In most cases training can slow down quite a bit as
             a result of this activation recomputation.
 
         - Precision. Full fp32 and bf16 training are supported. Precision is controlled using the ``dtype``
@@ -85,7 +85,7 @@ class LoRAFinetuneRecipeDistributed(FTRecipeInterface):
             please take a look at our LoRA tutorial
             (https://pytorch.org/torchtune/main/tutorials/lora_finetune.html).
 
-            Optimizer State and recipe state (seed, total_epochs, number of epochs run etc) are
+            Optimizer State and recipe state (seed, total_epochs, number of epochs run etc.) are
             only saved at the end of a given epoch and used in case of resuming training. Resuming
             training is controlled by the ``resume_from_checkpoint`` flag. Mid-epoch checkpointing is
             currently not supported.
@@ -168,7 +168,7 @@ class LoRAFinetuneRecipeDistributed(FTRecipeInterface):
                 raise ValueError(
                     "Adapter weights not found. Please ensure a valid adapter checkpoint is provided."
                 )
-            # _update_recipe_state will throw an exception if the recipe state is not corrctly loaded
+            # _update_recipe_state will throw an exception if the recipe state is not correctly loaded
             # no need to check here
             self._update_recipe_state(checkpoint_dict)
         return checkpoint_dict
@@ -272,7 +272,7 @@ class LoRAFinetuneRecipeDistributed(FTRecipeInterface):
             collate_fn=collate_name,
         )
 
-        # Finally update the recipe state which can only be correctly set after all of the
+        # Finally update the recipe state which can only be correctly set after all the
         # other components have been initialized and updated.
 
         # Number of training steps in each epoch depends on the number of batches produced
@@ -547,7 +547,7 @@ class LoRAFinetuneRecipeDistributed(FTRecipeInterface):
             collate_fn: str,
     ) -> Tuple[DistributedSampler, DataLoader]:
         """
-        All data related setup happens here. Currently this recipe only supports the
+        All data related setup happens here. Currently, this recipe only supports the
         DistributedSamplers with Map-style Datasets which fit into memory. Other samplers,
         iterable datasets and streaming datasets are not supported.
         """
@@ -704,7 +704,6 @@ class LoRAFinetuneRecipeDistributed(FTRecipeInterface):
         self._profiler.start()
         # self.epochs_run should be non-zero when we're resuming from a checkpoint
         for curr_epoch in range(self.epochs_run, self.total_epochs):
-
             # Update the sampler to ensure data is correctly shuffled across epochs
             # in case shuffle is True
             self._sampler.set_epoch(curr_epoch)
@@ -732,7 +731,6 @@ class LoRAFinetuneRecipeDistributed(FTRecipeInterface):
 
                 # Shape [b, s], needed for the loss not the model
                 labels = batch.pop("labels")
-
                 logits = self._model(**batch)
 
                 # Shift labels to compute loss
