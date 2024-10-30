@@ -50,9 +50,18 @@ save_adapter_weights_only: False
 # Dataset and Sampler
 dataset:
   packed: False # Set to true for great speed-ups
-  _component_: torchtune.datasets.alpaca_cleaned_dataset
-  source: json
-  data_files: /openbayes/home/datasets/alpaca_cleaned/data.json
+  # _component_: torchtune.datasets.alpaca_cleaned_dataset
+  # source: parquet
+  # data_files: /openbayes/home/datasets/python_alpaca_like/train-00000-of-00001.parquet
+  # source: json
+  # data_files: /openbayes/home/datasets/alpaca_cleaned/data.json
+  _component_: torchtune.datasets.instruct_dataset
+  source: parquet
+  data_files: /openbayes/home/datasets/reasoning_gsm_qna/data.parquet
+  column_map:
+    input: instruction
+    output: response
+  train_on_input: False
   split: train
 seed: null
 shuffle: True
@@ -82,7 +91,7 @@ output_dir: /openbayes/home/logging/
 metric_logger:
   _component_: swanlab_integrate.SwanLabLogger
   project: "llama3-fine-tune"
-  experiment_name: "task-2"
+  experiment_name: "task-3"
   log_dir: ${output_dir}
 log_every_n_steps: 1
 log_peak_memory_stats: True

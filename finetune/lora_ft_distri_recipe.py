@@ -11,7 +11,6 @@ from functools import partial
 from typing import Any, Dict, Optional, Tuple, Union
 from warnings import warn
 
-import swanlab
 import torch
 from omegaconf import DictConfig, ListConfig
 
