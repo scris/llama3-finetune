@@ -11,6 +11,7 @@ from functools import partial
 from typing import Any, Dict, Optional, Tuple, Union
 from warnings import warn
 
+import swanlab
 import torch
 from omegaconf import DictConfig, ListConfig
 
@@ -239,7 +240,11 @@ class LoRAFinetuneRecipeDistributed(FTRecipeInterface):
                 else None
             ),
         )
-        print(self._model)
+
+        # Task 2：只是微调其中部分层，只微调最后几层即可提升领域特定知识的能力
+        for name, param in self._model.named_parameters():
+            if not any(layer_name in name for layer_name in ["layers.31", "layers.30", "layers.29", "layers.28"]):
+                param.requires_grad = False
 
         self._tokenizer = config.instantiate(cfg.tokenizer)
 
@@ -514,7 +519,8 @@ class LoRAFinetuneRecipeDistributed(FTRecipeInterface):
             self, cfg_optimizer: DictConfig, opt_state_dict: Optional[Dict[str, Any]] = None
     ) -> Optimizer:
         # 如果需要只用一层，可以在这里设置只传入模型某部分的 .parameters()
-        optimizer = config.instantiate(cfg_optimizer, self._model.parameters())
+        # Task 2：标记为不使用的层也不传入 optimizer，节省训练开销
+        optimizer = config.instantiate(cfg_optimizer, filter(lambda param : param.requires_grad, self._model.parameters()))
         if opt_state_dict:
             training.load_from_full_optimizer_state_dict(
                 optimizer,

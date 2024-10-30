@@ -1,3 +1,7 @@
+### Todo
+
+- [ ] 更新 LoRA 层和 rank，查看结果区别
+
 ### Task 1
 
 在单卡 4090 上使用 torchtune 对 Llama-3.1-8B-Instruct 进行了 lora 微调，数据集为 Alpaca Cleaned Dataset（24.1 MB），单 epoch 耗时 2 小时 40 分钟。
@@ -10,6 +14,12 @@
 
 继续基于 torchtune 并将场景改换到代码生成，数据集为 Python Code Instructions 18k Alpaca（11.4 MB），在单卡 A6000 上单 epoch 耗时 1 小时 30 分钟。
 
-在单卡 A6000 上使用 torchtune eleuther_eval 进行基于 codexglue code2text_python 的模型评估。同时基于 truthfulqa_mc2 进行评估，结果是 0.5186 ± 0.015。
+在单卡 A6000 上使用 torchtune eleuther_eval 进行基于 arc_easy 的模型评估，单次耗时约 1 分钟，最大内存占用 34.68 GB。 
 
-- [ ] 更新 LoRA 层和 rank，查看结果区别
+未微调版本 acc_norm 为 0.7963 ± 0.0083，微调版本为 0.8035 ± 0.0082，体现了推理能力训练的可迁移性。使用这一数据集来代表的原因是代码生成数据集 code2text_python 执行太慢。
+
+同时也基于 truthfulqa_mc2 对微调版本进行完整评估，结果是 0.5186 ± 0.015。
+
+将 layers 28～31 以外的部分的 requires_grad 设为 False，并将这些不更新梯度的层排除在 optimizer 参数之外后，在单卡 A6000 上单 epoch 耗时 50 分钟。
+
+这一变更保证仍然可以训练模型的任务特定能力，减少了在通用特征层的计算量。在 arc_easy 的结果是 0.7950 ± 0.0083，在 truthfulqa_mc2 结果是 0.5373 ± 0.015。结果有待提升。

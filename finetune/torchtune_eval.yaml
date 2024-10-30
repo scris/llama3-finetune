@@ -33,6 +33,7 @@ seed: 1234 # It is not recommended to change this seed, b/c it matches EleutherA
 
 # EleutherAI specific eval args
 # tasks: ["truthfulqa_mc2"]
+# tasks: ["arc_easy"]
 tasks: ["code2text_python"]
 limit: null
 max_seq_length: 4096
