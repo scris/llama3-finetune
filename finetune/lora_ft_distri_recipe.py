@@ -14,7 +14,7 @@ from warnings import warn
 import torch
 from omegaconf import DictConfig, ListConfig
 
-from torch import nn
+from torch import nn, Tensor
 from torch.distributed import destroy_process_group, init_process_group
 
 from torch.optim import Optimizer
@@ -213,6 +213,32 @@ class LoRAFinetuneRecipeDistributed(FTRecipeInterface):
                 "Are you sure you passed in the right recipe checkpoint?"
             ) from e
 
+    # 前向传播过程中被调用，如果是修改输出，常被用于特征选择和增强
+    # 如果是 pre 钩子修改输入，常用于数据预处理和变换
+    # def forward_hook(self, module: nn.Module, args: Tuple[Tensor], output: Tensor):
+
+    # https://pytorch.ac.cn/docs/stable/generated/torch.nn.Module.html#torch.nn.Module.register_full_backward_hook
+    # 在反向传播更新模型权重的过程中被调用，用于处理模块的输入输出梯度
+    # 模块自身的权重更新是基于 input 梯度进行的
+    # 而修改 output 梯度，将会影响向后传播的梯度流的情况
+    def backward_hook(self, module: nn.Module, grad_input: Tuple[Tensor], grad_output: Tuple[Tensor]):
+        if not isinstance(module, nn.Linear): return None
+        linear_module: nn.Linear = module
+        weight_shape = linear_module.weight.shape
+        # 如果不是 lora_a 或者 lora_b，不进行变更
+        if weight_shape not in {torch.Size([8, 4096]), torch.Size([4096, 8])}: return None
+        new_grad_input = []
+        for gi in grad_input:
+            if gi is None:
+                new_grad_input.append(None)
+            else:
+                modified_gi = gi.clone()
+                modified_gi[:, :, ::2] = 0
+                new_grad_input.append(modified_gi)
+        if len(new_grad_input) == 0: return None
+        return tuple(new_grad_input)
+
+
     def setup(self, cfg: DictConfig) -> None:
         """
         Setup the recipe state. This includes recipe state (if resume_from_checkpoint is True),
@@ -241,9 +267,12 @@ class LoRAFinetuneRecipeDistributed(FTRecipeInterface):
         )
 
         # Task 2：只是微调其中部分层，只微调最后几层即可提升领域特定知识的能力
+        self._hooks = {}
         for name, param in self._model.named_parameters():
             if not any(layer_name in name for layer_name in ["layers.31", "layers.30", "layers.29", "layers.28"]):
                 param.requires_grad = False
+        for name, module in self._model.named_modules():
+            self._hooks["backward." + name] = module.register_full_backward_hook(self.backward_hook)
 
         self._tokenizer = config.instantiate(cfg.tokenizer)
 

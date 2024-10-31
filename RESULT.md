@@ -1,7 +1,3 @@
-### Todo
-
-- [ ] 更新 LoRA 层和 rank，查看结果区别
-
 ### Task 1
 
 在单卡 4090 上使用 torchtune 对 Llama-3.1-8B-Instruct 进行了 lora 微调，数据集为 Alpaca Cleaned Dataset（24.1 MB），单 epoch 耗时 2 小时 40 分钟。
@@ -18,7 +14,10 @@
 
 将 layer 25～31 以及 tok_embedding 以外的部分冻结，在单卡 A6000 上单 epoch 耗时 55 分钟。在 arc_easy 的结果是 0.7845 ± 0.0084，在 truthfulqa_mc2 结果是 0.5357 ± 0.0152。看来，需要重新考虑目标为能力迁移的冻结位置。
 
-改换数据集为 Reasoning GSM QnA OA（3.1 MB）以对齐评估数据集，在单卡 4090 上 layers 28～31 单 epoch 耗时 12 分钟。 此时，在 arc_easy 的结果是 0.7992 ± 0.0082，在 truthfulqa_mc2 结果是 0.5367 ± 0.0149。这一结果没有问题。
+改换数据集为 Reasoning GSM QnA OA（3.1 MB）以对齐评估数据集，在单卡 4090 上 layers 28～31 单 epoch 耗时 12 分钟。此时，在 arc_easy 的结果是 0.7992 ± 0.0082，在 truthfulqa_mc2 结果是 0.5367 ± 0.0149。这一结果没有问题。
 
 ### Task 3
 
+在反向传播更新模型权重的过程中，设置在 named_modules 上的 full_backward_hook 会被调用，用于处理模块的输入输出梯度。其中，模块自身的权重更新是基于 grad_input 进行的。因为没有减少实际计算量，在单卡 4090 上 layers 28～31 单 epoch 耗时不变。
+
+选取其中 linear 层中的 lora 层，将 grad_input 第三维每隔两个数之一设为 0 并返回，来使得这部分内容被实际冻结。此时，训练 loss 略微提升，token per sec 也略微增大。在 arc_easy 的结果是 0.8005 ± 0.0082，在 truthfulqa_mc2 结果是 0.5365 ± 0.0149。这一结果没有问题。
