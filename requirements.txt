@@ -1,0 +1,7 @@
+deepspeed==0.15.3
+huggingface-hub==0.26.1
+lm_eval==0.4.5
+swanlab==0.3.23
+torch==2.4.0+cu121
+torchtune==0.3.1
+transformers==4.44.0
