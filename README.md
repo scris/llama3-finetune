@@ -2,4 +2,4 @@
 
 Various things will be included in this repository. 
 
-The commands are listed in `finetune/torchtune.ipynb`. See RESULT.md for more information.
+The commands are listed in `torchtune/torchtune.ipynb`. See `RESULT.md` for more information.
